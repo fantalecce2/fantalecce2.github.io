@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FantaLecce Ranking</title>
+  <style>
+    :root {
+      --rosso-lecce: #d8232a;
+      --giallo-lecce: #f4c300;
+      --sfondo: #fafafa;
+      --ombra: rgba(0, 0, 0, 0.15);
+      --testo-intestazione: #ffffff;
+    }
+
+    body {
+      font-family: "Poppins", Arial, sans-serif;
+      background: linear-gradient(180deg, var(--rosso-lecce), var(--giallo-lecce));
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: #222;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    header img {
+      height: 50px;
+      width: auto;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    h1 {
+      color: white;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+      font-size: 2.2em;
+      margin: 0;
+    }
+
+    table {
+      margin: 30px auto;
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 600px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px var(--ombra);
+      overflow: hidden;
+      animation: fadeIn 0.7s ease;
+    }
+
+    th, td {
+      padding: 14px 10px;
+      text-align: center;
+    }
+
+    thead th {
+      background: linear-gradient(90deg, #b71c1c, #7b1111);
+      color: var(--testo-intestazione);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 0.95em;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #f9f9f9;
+    }
+
+    tbody tr:hover {
+      background: #fff4cc;
+      transition: background 0.3s ease;
+    }
+
+    td:first-child {
+      font-weight: bold;
+      color: var(--rosso-lecce);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      table {
+        width: 95%;
+        font-size: 0.9em;
+      }
+      header img {
+        height: 40px;
+      }
+      h1 {
+        font-size: 1.6em;
+      }
+      th, td {
+        padding: 10px 6px;
+      }
+    }
+
+    footer {
+      color: white;
+      margin-top: auto;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- Inserisci qui il tuo logo (puoi sostituire l’URL sotto con il file locale o un link a un'immagine pubblica) -->
+    <img src="https://upload.wikimedia.org/wikipedia/it/thumb/3/36/US_Lecce_Stemma.svg/820px-US_Lecce_Stemma.svg.png" alt="Logo Lecce">
+    <h1>FantaLecce Ranking</h1>
+  </header>
+
+  <table id="classifica">
+    <thead>
+      <tr><th>Posizione</th><th>Nome</th><th>Punti</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <footer>⚽ Aggiornato automaticamente dai dati di Google Sheets</footer>
+
+  <script>
+    const SHEET_ID = "11x5wneYKTfhpNzOCq8ImCvxiXdxYqWe160tNV3Ar6oo"; // <-- tuo ID
+    const API_KEY = "AIzaSyAlqDsWPDCl8kjr44nOoh2MEIgACt2RRFU";
+    const RANGE = "Foglio1!A4:B43"; // Nome foglio e range (adatta al tuo caso)
+
+    async function caricaClassifica() {
+      try {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const rows = data.values || [];
+
+        // Ordina per punteggio (colonna 2)
+        const ordinato = rows.sort((a, b) => Number(b[1]) - Number(a[1]));
+
+        const tbody = document.querySelector("#classifica tbody");
+        tbody.innerHTML = "";
+
+        ordinato.forEach((riga, i) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${i + 1}</td><td>${riga[0]}</td><td>${riga[1]}</td>`;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error("Errore nel caricamento:", err);
+        document.querySelector("#classifica tbody").innerHTML =
+          `<tr><td colspan="3">Errore nel caricamento dati 😕</td></tr>`;
+      }
+    }
+
+    caricaClassifica();
+  </script>
+</body>
+</html> 
