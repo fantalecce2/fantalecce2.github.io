@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FantaLecce Ranking</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --rosso-lecce: #d8232a;
+      --rosso-scuro: #8a1014;
+      --giallo-lecce: #ffcc00;
+      --sfondo-scuro: #1a1a1a;
+      --bianco: #ffffff;
+      --oro: #ffd700;
+      --argento: #c0c0c0;
+      --bronzo: #cd7f32;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      /* Sfondo sfumato con pattern leggero */
+      background: radial-gradient(circle at top, #2b2b2b, var(--sfondo-scuro));
+      background-attachment: fixed;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--bianco);
+    }
+
+    /* --- Header --- */
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      text-align: center;
+      animation: slideDown 0.8s ease-out;
+    }
+
+    header img {
+      height: 80px;
+      width: auto;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 15px rgba(216, 35, 42, 0.6));
+      transition: transform 0.3s;
+    }
+
+    header img:hover {
+      transform: scale(1.1) rotate(-5deg);
+    }
+
+    h1 {
+      font-family: "Montserrat", sans-serif;
+      font-weight: 900;
+      font-size: 2.8em;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      /* Effetto testo gradiente Giallo/Rosso */
+      background: linear-gradient(135deg, var(--giallo-lecce) 30%, var(--rosso-lecce) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9em;
+      margin-top: 5px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    /* --- Container Classifica --- */
+    .ranking-container {
+      width: 90%;
+      max-width: 650px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      margin-bottom: 40px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate; 
+      border-spacing: 0 8px; /* Spazio tra le righe */
+    }
+
+    thead th {
+      color: var(--giallo-lecce);
+      text-transform: uppercase;
+      font-size: 0.85em;
+      letter-spacing: 1px;
+      padding: 0 15px 10px 15px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    tbody tr {
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: default;
+      opacity: 0; /* Per l'animazione JS */
+      animation: fadeInUp 0.5s forwards;
+    }
+
+    tbody tr:hover {
+      transform: scale(1.02);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      z-index: 10;
+      position: relative;
+    }
+
+    td {
+      padding: 15px;
+      font-weight: 600;
+    }
+
+    /* Bordi arrotondati per le righe */
+    td:first-child { border-radius: 10px 0 0 10px; }
+    td:last-child { border-radius: 0 10px 10px 0; }
+
+    /* Colonna Posizione */
+    td.pos {
+      width: 50px;
+      text-align: center;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 900;
+      font-size: 1.2em;
+      color: #444;
+    }
+
+    /* Colonna Punti */
+    td.points {
+      text-align: right;
+      color: var(--rosso-lecce);
+      font-weight: 800;
+      font-size: 1.1em;
+    }
+
+    /* --- Stili Speciali per il Podio --- */
+    tr.rank-1 { background: linear-gradient(90deg, #fff, var(--oro)); border: 2px solid var(--oro); }
+    tr.rank-2 { background: linear-gradient(90deg, #fff, var(--argento)); border: 2px solid var(--argento); }
+    tr.rank-3 { background: linear-gradient(90deg, #fff, var(--bronzo)); border: 2px solid var(--bronzo); }
+
+    .medal { font-size: 1.2em; margin-right: 5px; }
+
+    /* --- Loader --- */
+    #loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 50px 0;
+    }
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-left-color: var(--giallo-lecce);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    .loading-text { margin-top: 10px; font-size: 0.9em; opacity: 0.7; }
+
+    /* --- Footer --- */
+    footer {
+      margin-top: auto;
+      margin-bottom: 20px;
+      font-size: 0.8em;
+      opacity: 0.5;
+      text-align: center;
+    }
+
+    /* --- Animations --- */
+    @keyframes slideDown {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive Mobile */
+    @media (max-width: 600px) {
+      h1 { font-size: 1.8em; }
+      .ranking-container { width: 95%; padding: 10px; }
+      td { padding: 12px 8px; font-size: 0.9em; }
+      header img { height: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/it/thumb/3/36/US_Lecce_Stemma.svg/820px-US_Lecce_Stemma.svg.png" alt="Logo Lecce">
+    <h1>FantaLecce</h1>
+    <div class="subtitle">Official Ranking Season 24/25</div>
+  </header>
+
+  <div class="ranking-container">
+    <div id="loader">
+      <div class="spinner"></div>
+      <div class="loading-text">Caricamento dati...</div>
+    </div>
+
+    <table id="classifica" style="display: none;">
+      <thead>
+        <tr>
+          <th style="text-align: center;">#</th>
+          <th style="text-align: left;">Squadra</th>
+          <th style="text-align: right;">Punti</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <footer>
+    ⚽ Aggiornato automaticamente da Google Sheets <br> Forza Lecce! 🟡🔴
+  </footer>
+
+  <script>
+    const SHEET_ID = "11x5wneYKTfhpNzOCq8ImCvxiXdxYqWe160tNV3Ar6oo"; 
+    const API_KEY = "AIzaSyAlqDsWPDCl8kjr44nOoh2MEIgACt2RRFU";
+    const RANGE = "Foglio1!A4:B43"; 
+
+    async function caricaClassifica() {
+      const loader = document.getElementById("loader");
+      const tabella = document.getElementById("classifica");
+      const tbody = tabella.querySelector("tbody");
+
+      try {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const rows = data.values || [];
+
+        // Ordina per punteggio in modo decrescente (convertendo stringa in numero)
+        const ordinato = rows.sort((a, b) => {
+            // Rimuove eventuali virgole se i numeri sono formattati all'italiana (es 10,5 -> 10.5)
+            let valA = parseFloat(a[1].replace(',', '.'));
+            let valB = parseFloat(b[1].replace(',', '.'));
+            return valB - valA;
+        });
+
+        tbody.innerHTML = "";
+
+        ordinato.forEach((riga, i) => {
+          const tr = document.createElement("tr");
+          const posizione = i + 1;
+          
+          // Gestione Podio
+          let icon = "";
+          let rankClass = "";
+          
+          if (posizione === 1) { icon = "🥇"; rankClass = "rank-1"; }
+          else if (posizione === 2) { icon = "🥈"; rankClass = "rank-2"; }
+          else if (posizione === 3) { icon = "🥉"; rankClass = "rank-3"; }
+
+          if (rankClass) tr.classList.add(rankClass);
+
+          // Delay animazione per effetto a cascata (0.1s per ogni riga)
+          tr.style.animationDelay = `${i * 0.05}s`;
+
+          tr.innerHTML = `
+            <td class="pos">${icon ? icon : position}</td>
+            <td class="team">${riga[0]}</td>
+            <td class="points">${riga[1]}</td>
+          `;
+          
+          // Fix per la colonna posizione: se c'è l'icona mostra solo quella, altrimenti il numero
+          tr.querySelector('.pos').innerText = icon ? icon : posizione;
+
+          tbody.appendChild(tr);
+        });
+
+        // Nascondi loader, mostra tabella
+        loader.style.display = "none";
+        tabella.style.display = "table";
+
+      } catch (err) {
+        console.error("Errore nel caricamento:", err);
+        loader.innerHTML = `<div style="color: #ff6b6b">Errore nel caricamento dati 😕<br><small>Controlla l'API Key o l'ID foglio</small></div>`;
+      }
+    }
+
+    caricaClassifica();
+  </script>
+</body>
+</html>
