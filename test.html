@@ -293,10 +293,10 @@
         loader.style.display = "none";
         tabella.style.display = "table";
 
-      } //catch (err) {
-        //console.error("Errore nel caricamento:", err);
-        //loader.innerHTML = `<div style="color: #ff6b6b">Errore nel caricamento dati 😕<br><small>Controlla l'API Key o l'ID foglio</small></div>`;
-      //}
+      } catch (err) {
+        console.error("Errore nel caricamento:", err);
+        loader.innerHTML = `<div style="color: #ff6b6b">Errore nel caricamento dati 😕<br><small>Controlla l'API Key o l'ID foglio</small></div>`;
+      }
     }
 
     caricaClassifica();
